@@ -2,12 +2,11 @@ import React, {useState} from 'react';
 import {View, Button} from 'react-native';
 import {Card, Input, Icon} from 'react-native-elements';
 
-function SignUpEmailForm() {
+function LoginEmailForm() {
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const [repassword, setRepassword] = useState('');
 
   function validateEmail() {
     let regexEmail = new RegExp(
@@ -22,21 +21,8 @@ function SignUpEmailForm() {
     return isValid;
   }
 
-  function validatePassword() {
-    if (password.length < 8) {
-      setPasswordError('Password must be at least 8 characters');
-      return false;
-    }
-    if (password !== repassword) {
-      setPasswordError('Passwords do not match');
-      return false;
-    }
-    setPasswordError('');
-    return true;
-  }
-
   function onSubmit() {
-    let isValid = validateEmail() && validatePassword();
+    let isValid = validateEmail();
 
     //for testing
     if (isValid) {
@@ -46,7 +32,7 @@ function SignUpEmailForm() {
 
   return (
     <View>
-      <Card title="Sign Up">
+      <Card title="Login">
         <Input
           label="Email Address"
           placeholder="Email Address"
@@ -74,35 +60,15 @@ function SignUpEmailForm() {
           }}
           onChangeText={text => {
             setPassword(text);
-            if (passwordError) {
-              validatePassword();
-            }
           }}
           errorMessage={passwordError}
         />
-        <Input
-          label="Re-enter Password"
-          placeholder="Password"
-          secureTextEntry={true}
-          textContentType="newPassword"
-          leftIcon={{
-            type: 'material',
-            name: 'lock',
-          }}
-          onChangeText={text => {
-            setRepassword(text);
-            if (passwordError) {
-              validatePassword();
-            }
-          }}
-          errorMessage={passwordError}
-        />
-        <Button onPress={onSubmit} title="Sign Up" />
+        <Button onPress={onSubmit} title="Login" />
       </Card>
     </View>
   );
 }
 
-export default function SignUpScreen() {
-  return <SignUpEmailForm />;
+export default function LoginScreen() {
+  return <LoginEmailForm />;
 }

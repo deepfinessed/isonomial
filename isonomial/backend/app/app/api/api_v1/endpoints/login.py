@@ -19,8 +19,8 @@ from app.utils import (
 router = APIRouter()
 
 
-@router.post("/login/access-token", response_model=schemas.Token)
-def login_access_token(
+@router.post("/login/refresh-token", response_model=schemas.RefreshToken)
+def login_refresh_token(
     db: Session = Depends(deps.get_db), form_data: OAuth2PasswordRequestForm = Depends()
 ) -> Any:
     """
@@ -38,6 +38,7 @@ def login_access_token(
         "access_token": security.create_access_token(
             user.id, expires_delta=access_token_expires
         ),
+        "refresh_token": security.create_refresh_token(user.id),
         "token_type": "bearer",
     }
 
@@ -94,3 +95,14 @@ def reset_password(
     db.add(user)
     db.commit()
     return {"msg": "Password updated successfully"}
+
+
+@router.post("/login/refresh-for-access-token", response_model=schemas.Token)
+def get_access_from_refresh(user: models.User = Depends(deps.get_user_from_refresh_token)):
+    new_access_token = security.create_access_token(
+        subject=user.id, expires_delta=settings.ACCESS_TOKEN_EXPIRE_MINUTES
+    )
+    return {
+        "access_token": new_access_token,
+        "token_type": "bearer"
+    }

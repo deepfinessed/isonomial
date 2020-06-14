@@ -24,7 +24,14 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
-import SignUpEmailForm from './app/screens/SignUp';
+
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
+
+import UserContextProvider from './app/utils/UserContext';
+import SignUpScreen from './app/screens/SignUp';
+import LoginScreen from './app/screens/Login';
+import WelcomeScreen from './app/screens/Welcome';
 
 // const App: () => React$Node = () => {
 //   return (
@@ -74,47 +81,20 @@ import SignUpEmailForm from './app/screens/SignUp';
 //   );
 // };
 
-const App: () => React$Node = () => {
-  return <SignUpEmailForm />;
-};
+const TopLevelStack = createStackNavigator();
 
-const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter,
-  },
-  engine: {
-    position: 'absolute',
-    right: 0,
-  },
-  body: {
-    backgroundColor: Colors.white,
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
-  },
-});
+const App: () => React$Node = () => {
+  return (
+    <NavigationContainer>
+      <TopLevelStack.Navigator>
+        <UserContextProvider>
+          <TopLevelStack.Screen name="Welcome" component={WelcomeScreen} />
+          <TopLevelStack.Screen name="Sign Up" component={SignUpScreen} />
+          <TopLevelStack.Screen name="Login" component={LoginScreen} />
+        </UserContextProvider>
+      </TopLevelStack.Navigator>
+    </NavigationContainer>
+  );
+};
 
 export default App;
