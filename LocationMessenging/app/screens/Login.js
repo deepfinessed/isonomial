@@ -1,12 +1,18 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {View, Button} from 'react-native';
 import {Card, Input, Icon} from 'react-native-elements';
+import AsyncStorage from '@react-native-community/async-storage';
+
+import Config from '../config/Config';
+import {storeRefreshToken, getRefreshToken} from '../utils/credentials';
+import {UserContext} from '../utils/UserContext';
 
 function LoginEmailForm() {
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const user = useContext(UserContext);
 
   function validateEmail() {
     let regexEmail = new RegExp(
@@ -21,12 +27,49 @@ function LoginEmailForm() {
     return isValid;
   }
 
+  async function submitLogin() {
+    const formData = {
+      username: email,
+      password: password,
+    };
+    //manually build www-urlencoded form for backend
+    let formBody = [];
+    for (let item in formData) {
+      let key = encodeURIComponent(item);
+      let value = encodeURIComponent(formData[item]);
+      formBody.push(key + '=' + value);
+    }
+    formBody = formBody.join('&');
+    //and send the request
+
+    let uriTarget = Config.BASE_API_URI + 'login/refresh-token';
+
+    const response = await fetch(uriTarget, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: formBody,
+    });
+    if (response.ok) {
+      response.json().then(data => {
+        storeRefreshToken(data.refresh_token).then(() => {});
+        user.setAccessToken(data.access_token);
+        AsyncStorage.setItem('accessToken', data.access_token);
+        user.setIsLoggedIn(true);
+      });
+    } else {
+      setEmailError('Incorrect email or password');
+      setPasswordError('Incorrect email or password');
+    }
+  }
+
   function onSubmit() {
     let isValid = validateEmail();
 
     //for testing
     if (isValid) {
-      alert('You have submitted');
+      submitLogin();
     }
   }
 

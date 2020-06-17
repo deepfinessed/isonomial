@@ -1,6 +1,9 @@
 import React, {useState} from 'react';
 import {View, Button} from 'react-native';
 import {Card, Input, Icon} from 'react-native-elements';
+import {useNavigation} from '@react-navigation/native';
+
+import Config from '../config/Config';
 
 function SignUpEmailForm() {
   const [email, setEmail] = useState('');
@@ -8,6 +11,33 @@ function SignUpEmailForm() {
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [repassword, setRepassword] = useState('');
+
+  const nav = useNavigation();
+
+  async function submitSignUp() {
+    const uriTarget = Config.BASE_API_URI + 'users/signup';
+    const bodyObj = {
+      email: email,
+      password: password,
+    };
+    const response = await fetch(uriTarget, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(bodyObj),
+    });
+    if (response.ok) {
+      nav.navigate('Login');
+    } else {
+      //for debugging
+      // console.log(uriTarget);
+      // console.log(response.statusText);
+      // let respObj = await response.json();
+      // console.log(respObj);
+      setEmailError('A user with that email already exists.');
+    }
+  }
 
   function validateEmail() {
     let regexEmail = new RegExp(
@@ -40,7 +70,7 @@ function SignUpEmailForm() {
 
     //for testing
     if (isValid) {
-      alert('You have submitted');
+      submitSignUp();
     }
   }
 

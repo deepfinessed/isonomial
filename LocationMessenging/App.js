@@ -24,11 +24,12 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
-
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 
 import UserContextProvider from './app/utils/UserContext';
+import NetworkContextProvider from './app/utils/NetworkContext';
+import TopLevelNavigator from './app/routes/TopLevelNavigator';
 import SignUpScreen from './app/screens/SignUp';
 import LoginScreen from './app/screens/Login';
 import WelcomeScreen from './app/screens/Welcome';
@@ -81,18 +82,14 @@ import WelcomeScreen from './app/screens/Welcome';
 //   );
 // };
 
-const TopLevelStack = createStackNavigator();
-
 const App: () => React$Node = () => {
   return (
     <NavigationContainer>
-      <TopLevelStack.Navigator>
-        <UserContextProvider>
-          <TopLevelStack.Screen name="Welcome" component={WelcomeScreen} />
-          <TopLevelStack.Screen name="Sign Up" component={SignUpScreen} />
-          <TopLevelStack.Screen name="Login" component={LoginScreen} />
-        </UserContextProvider>
-      </TopLevelStack.Navigator>
+      <UserContextProvider>
+        <NetworkContextProvider>
+          <TopLevelNavigator />
+        </NetworkContextProvider>
+      </UserContextProvider>
     </NavigationContainer>
   );
 };

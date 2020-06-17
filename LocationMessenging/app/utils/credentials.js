@@ -10,9 +10,15 @@ export async function getRefreshToken() {
 }
 
 export async function storeRefreshToken(token) {
+  let refreshPromise;
   try {
-    await Keychain.setInternetCredentials('isonomial', 'user', 'token');
+    refreshPromise = Keychain.setInternetCredentials(
+      'isonomial',
+      'user',
+      token,
+    );
   } catch (error) {
     console.log(error);
   }
+  return refreshPromise;
 }

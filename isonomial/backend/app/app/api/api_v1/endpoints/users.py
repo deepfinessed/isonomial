@@ -27,12 +27,11 @@ def read_users(
     return users
 
 
-@router.post("/", response_model=schemas.User)
+@router.post("/signup", response_model=schemas.User)
 def create_user(
     *,
     db: Session = Depends(deps.get_db),
     user_in: schemas.UserCreate,
-    current_user: models.User = Depends(deps.get_current_active_superuser),
 ) -> Any:
     """
     Create new user.
