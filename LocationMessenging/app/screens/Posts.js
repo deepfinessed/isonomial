@@ -16,12 +16,14 @@ import {NetworkContext} from '../utils/NetworkContext';
 import {styles} from '../styles/defaultStyles';
 
 export default function PostScreen(props) {
-  const locationScope = React.useState(null);
-  const geolocatedLocation = React.useState(null);
-  const locationScopes = React.useState([]);
+  const [locationScope, setLocationScope] = React.useState(null);
+  const [geolocatedLocation, setGeoLocatedLocation] = React.useState(null);
+  const [locationScopes, setLocationScopes] = React.useState([]);
+  const [posts, setPosts] = React.useState([]);
   const user = useContext(UserContext);
   const network = useContext(NetworkContext);
 
+  //get permissions on android
   useEffect(() => {
     async function getPerms() {
       if (Platform.OS === 'android') {
@@ -71,7 +73,7 @@ export default function PostScreen(props) {
         })
           .then(response => response.json())
           .then(data => {
-            console.log(data);
+            setLocationScopes(data);
           });
       },
     [network.authenticatedHeader],
@@ -101,7 +103,7 @@ export default function PostScreen(props) {
                 timestamp: loc.timestamp,
               };
               let targetURI =
-                Config.BASE_API_URI + 'utils/get-scopes-from-location';
+                Config.BASE_API_URI + 'utils/get-scopes-from-location/';
               fetch(targetURI, {
                 method: 'POST',
                 headers: network.authenticatedHeader,
