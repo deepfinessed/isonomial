@@ -9,6 +9,8 @@ export default ({children}) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [location, setLocation] = useState(null);
   const [locationLastUpdateTime, setLocationLastUpdateTime] = useState(null);
+  const [locationScopes, setLocationScopes] = React.useState([]);
+  const [activeScope, setActiveScope] = React.useState(null);
 
   const userContext = {
     accessToken: accessToken,
@@ -19,6 +21,10 @@ export default ({children}) => {
     setLocation: setLocation,
     locationLastUpdateTime: locationLastUpdateTime,
     setLocationLastUpdateTime: setLocationLastUpdateTime,
+    locationScopes: locationScopes,
+    setLocationScopes: setLocationScopes,
+    activeScope: activeScope,
+    setActiveScope: setActiveScope,
   };
 
   return (

@@ -18,7 +18,6 @@ import {styles} from '../styles/defaultStyles';
 export default function PostScreen(props) {
   const [locationScope, setLocationScope] = React.useState(null);
   const [geolocatedLocation, setGeoLocatedLocation] = React.useState(null);
-  const [locationScopes, setLocationScopes] = React.useState([]);
   const [posts, setPosts] = React.useState([]);
   const user = useContext(UserContext);
   const network = useContext(NetworkContext);
@@ -73,10 +72,10 @@ export default function PostScreen(props) {
         })
           .then(response => response.json())
           .then(data => {
-            setLocationScopes(data);
+            user.setLocationScopes(data);
           });
       },
-    [network.authenticatedHeader],
+    [network.authenticatedHeader, user],
   );
 
   useEffect(() => {
@@ -112,6 +111,7 @@ export default function PostScreen(props) {
                 .then(response => response.json())
                 .then(data => {
                   console.log(data);
+                  user.setLocationScopes(data);
                 });
             },
             error => console.log(error),
