@@ -57,6 +57,13 @@ export default function CreatePostScreen(props) {
         />
       </View>
       <Button title="Post" onPress={onSubmit} />
+      <Button
+        title={
+          'Go back to posts in ' +
+          (user.activeScope ? user.activeScope : 'your area')
+        }
+        onPress={() => props.navigation.navigate('Posts')}
+      />
     </View>
   );
 }

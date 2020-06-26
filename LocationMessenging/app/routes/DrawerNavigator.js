@@ -13,15 +13,15 @@ import CreatePostScreen from '../screens/CreatePost';
 import {useNavigation} from '@react-navigation/core';
 import {Text} from 'react-native';
 
-const Drawer = createDrawerNavigator();
+export const Drawer = createDrawerNavigator();
 
-function CustomDrawerContent(props) {
+export function CustomDrawerContent(props) {
   const user = useContext(UserContext);
-  const nav = useNavigation();
+  //const nav = useNavigation();
 
   function navToScope(scope) {
     user.setActiveScope(scope);
-    nav.navigate('Posts');
+    props.navigation.navigate('Posts');
   }
 
   return (
@@ -41,7 +41,7 @@ function CustomDrawerContent(props) {
       })}
       <DrawerItem
         label="Make a Post"
-        onPress={() => nav.navigate('CreatePost')}
+        onPress={() => props.navigation.navigate('CreatePost')}
       />
     </DrawerContentScrollView>
   );
@@ -50,6 +50,7 @@ function CustomDrawerContent(props) {
 export default function DrawerNavigator(props) {
   return (
     <Drawer.Navigator
+      initialRouteName="Posts"
       drawerContent={props => <CustomDrawerContent {...props} />}>
       <Drawer.Screen name="Posts" component={PostScreen} />
       <Drawer.Screen name="CreatePost" component={CreatePostScreen} />

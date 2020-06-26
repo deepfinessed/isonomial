@@ -7,7 +7,9 @@ import SignUpScreen from '../screens/SignUp';
 import LoginScreen from '../screens/Login';
 import WelcomeScreen from '../screens/Welcome';
 import PostScreen from '../screens/Posts';
+import {Drawer, CustomDrawerContent} from './DrawerNavigator';
 import DrawerNavigator from './DrawerNavigator';
+import CreatePostScreen from '../screens/CreatePost';
 
 const TopLevelStack = createStackNavigator();
 
@@ -28,6 +30,10 @@ export default function TopLevelNavigator() {
       {user.isLoggedIn ? (
         <>
           <TopLevelStack.Screen name="Drawer" component={DrawerNavigator} />
+          <TopLevelStack.Screen
+            name="CreatePost"
+            component={CreatePostScreen}
+          />
         </>
       ) : (
         <>
