@@ -11,8 +11,8 @@ export default ({children}) => {
   const user = React.useContext(UserContext);
 
   async function refreshAccessToken() {
-    let refreshURL = Config.BASE_API_URI + '/login/refresh-for-access-token';
-    let refreshToken = getRefreshToken();
+    let refreshURL = Config.BASE_API_URI + 'login/refresh-for-access-token';
+    let refreshToken = await getRefreshToken();
     let bodyObj = {refresh_token: refreshToken};
     let response = await fetch(refreshURL, {
       method: 'POST',

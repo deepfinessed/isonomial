@@ -33,9 +33,9 @@ export function CustomDrawerContent(props) {
           <DrawerItem
             label={() => <Text>{scope.name}</Text>}
             onPress={() => {
-              navToScope(scope.name);
+              navToScope(scope);
             }}
-            focused={user.activeScope === scope.name}
+            focused={user.activeScope?.name === scope.name}
           />
         );
       })}

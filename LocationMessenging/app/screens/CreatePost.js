@@ -22,12 +22,15 @@ export default function CreatePostScreen(props) {
   const user = useContext(UserContext);
 
   function onSubmit() {
-    const targetURI = Config.BASE_API_URI + '/posts/create';
+    const targetURI = Config.BASE_API_URI + 'posts/create';
 
     const payload = {
       scopes: user.locationScopes,
       text: text,
     };
+
+    console.log('Creating post with scopes:');
+    console.log(user.locationScopes);
 
     fetch(targetURI, {
       method: 'POST',
@@ -35,7 +38,10 @@ export default function CreatePostScreen(props) {
       body: JSON.stringify(payload),
     }).then(async response => {
       if (response.ok) {
+        //debug
         response.json().then(obj => console.log(obj));
+        //end debug
+        props.navigation.navigate('Posts');
       } else if (response.status === 401) {
         await network.refreshAccessToken();
         onSubmit();

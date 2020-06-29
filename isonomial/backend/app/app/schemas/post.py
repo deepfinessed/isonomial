@@ -1,9 +1,9 @@
-from datetime import datetime
-from typing import Optional
+from datetime import datetime, timedelta
+from typing import Optional, List
 
 from pydantic import BaseModel
 
-from app.schemas import User
+from app.schemas import User, LocationScope
 
 RELEVANT_GOOGLE_LOCATION_SCOPES = {
     'country', 'administrative_area_level_1', 'administrative_area_level_2', 'administrative_area_level_3',
@@ -34,8 +34,9 @@ class PostBase(BaseModel):
     # END SCOPES
 
 
-class PostCreate(PostBase):
-    pass
+class PostCreate(BaseModel):
+    text: str
+    scopes: List[LocationScope]
 
 
 class PostInDB(PostBase):
@@ -47,4 +48,14 @@ class PostInDB(PostBase):
 
 
 class Post(PostInDB):
-    pass
+    def __repr__(self):
+        return "%s(%r)" % (self.__class__, self.__dict__)
+
+
+class PostRequest(BaseModel):
+    scopes: List[LocationScope]
+    active_scope: LocationScope
+    page: Optional[int] = 0
+    order_by: Optional[str] = 'date'
+    after_date: Optional[datetime] = datetime.utcnow() - timedelta(days=1)
+

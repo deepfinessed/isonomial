@@ -14,3 +14,7 @@ class TokenPayload(BaseModel):
 
 class RefreshToken(Token):
     refresh_token: str
+
+
+class RefreshTokenPost(BaseModel):
+    refresh_token: str

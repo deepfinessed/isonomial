@@ -10,6 +10,7 @@ from app import crud, models, schemas
 from app.core import security
 from app.core.config import settings
 from app.db.session import SessionLocal
+from app.backend_pre_start import logger
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/login/refresh-token"
@@ -67,11 +68,11 @@ def get_current_active_superuser(
 
 
 def get_user_from_refresh_token(
-    refresh_token: str, db: Session = Depends(get_db)
+    refresh_token: schemas.RefreshTokenPost, db: Session = Depends(get_db)
 ) -> models.User:
     try:
         payload = jwt.decode(
-            refresh_token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
+            refresh_token.refresh_token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
         )
     except jwt.ExpiredSignatureError:
         raise HTTPException(
@@ -90,5 +91,6 @@ def get_user_from_refresh_token(
         )
     user = crud.user.get(db, id=payload["sub"])
     if not user:
+        logger.info("Attempted to refresh user %s", payload["sub"])
         raise HTTPException(status_code=404, detail="User not found")
     return user

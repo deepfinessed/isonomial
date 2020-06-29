@@ -1,4 +1,4 @@
-import React, {useCallback, useContext, useEffect} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 import {
   Button,
   Text,
@@ -6,6 +6,8 @@ import {
   ScrollView,
   Platform,
   PermissionsAndroid,
+  FlatList,
+  ActivityIndicator,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import Geolocation from '@react-native-community/geolocation';
@@ -24,6 +26,9 @@ export default function PostScreen(props) {
   const [locationScope, setLocationScope] = React.useState(null);
   const [geolocatedLocation, setGeoLocatedLocation] = React.useState(null);
   const [posts, setPosts] = React.useState([]);
+  const [page, setPage] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadingBottom, setLoadingBottom] = useState(false);
   const user = useContext(UserContext);
   const network = useContext(NetworkContext);
   const nav = useNavigation();
@@ -61,46 +66,49 @@ export default function PostScreen(props) {
     getPerms();
   }, []);
 
-  const updateLocationScopes = React.useCallback(
-    location =>
-      function updateScopes(loc) {
-        console.log(loc);
-        let locationPost = {
-          latitude: loc.coords.latitude,
-          longitude: loc.coords.longitude,
-          timestamp: loc.timestamp,
-        };
-        let targetURI = Config.BASE_API_URI + 'utils/get-scopes-from-location';
-        fetch(targetURI, {
-          method: 'POST',
-          headers: network.authenticatedHeader,
-          body: JSON.stringify(locationPost),
-        })
-          .then(response => response.json())
-          .then(data => {
-            user.setLocationScopes(data);
-            if (!user.activeScope) {
-              user.setActiveScope(user.locationScopes[0]);
-            }
-          });
-      },
-    [network.authenticatedHeader, user],
+  useFocusEffect(
+    useCallback(() => {
+      Geolocation.getCurrentPosition(
+        loc => {
+          console.log(loc);
+          let locationPost = {
+            latitude: loc.coords.latitude,
+            longitude: loc.coords.longitude,
+            timestamp: loc.timestamp,
+          };
+          let targetURI =
+            Config.BASE_API_URI + 'utils/get-scopes-from-location/';
+          fetch(targetURI, {
+            method: 'POST',
+            headers: network.authenticatedHeader,
+            body: JSON.stringify(locationPost),
+          })
+            .then(response => response.json())
+            .then(data => {
+              user.setLocationScopes(data);
+              if (!user.activeScope) {
+                user.setActiveScope(user.locationScopes[0]);
+              }
+            });
+        },
+        error => console.log(error),
+      );
+    }, []),
   );
-
-  useEffect(() => {
-    Geolocation.getCurrentPosition(
-      position => updateLocationScopes(position),
-      error => console.log(error),
-    );
-  }, [updateLocationScopes]);
 
   useFocusEffect(
     useCallback(() => {
-      if (!user.activeScope) {
-        user.setActiveScope(user.locationScopes[0].name);
+      if (!user.activeScope && user.locationScopes.length !== 0) {
+        user.setActiveScope(user.locationScopes[0]);
       }
-    }, [user]),
+    }, [user.locationScopes]),
   );
+
+  function handleLoadMore() {
+    setLoadingBottom(true);
+    setPage(oldPage => oldPage + 1);
+    fetchPosts();
+  }
 
   function testGeolocation() {
     Geolocation.getCurrentPosition(
@@ -121,10 +129,18 @@ export default function PostScreen(props) {
           .then(data => {
             console.log(data);
             user.setLocationScopes(data);
+            if (!user.activeScope) {
+              user.setActiveScope(user.setLocationScopes[0]);
+            }
           });
       },
       error => console.log(error),
     );
+  }
+
+  function clearData() {
+    AsyncStorage.removeItem('accessToken');
+    user.setIsLoggedIn(false);
   }
 
   function renderPost(post) {
@@ -134,16 +150,63 @@ export default function PostScreen(props) {
           <Icon.Button name="chevron-up" onPress={() => {}} />
           <Text>{post.text}</Text>
           <Icon.Button name="chevron-down" onPress={() => {}} />
+          <Moment
+            element={Text}
+            style={postStyles.footerText}
+            fromNow={true}
+            date={post.date}
+          />
         </View>
-        <Moment style={postStyles.footerText} fromNow={true} date={post.date} />
         <View style={postStyles.textContainer}>
           <Text style={postStyles.locationText}>
-            <Icon name="map-marker-alt" /> {post.}
+            <Icon name="map-marker" /> {post.neighborhood}
           </Text>
+          <Text>{post.text}</Text>
         </View>
       </View>
     );
   }
+
+  function renderFooter() {
+    if (!loadingBottom) {
+      return null;
+    }
+    return <ActivityIndicator animating size={'large'} />;
+  }
+
+  function fetchPosts() {
+    const targetURI = Config.BASE_API_URI + 'posts/get';
+    const requestBody = {
+      scopes: user.locationScopes,
+      active_scope: user.activeScope,
+      page: page,
+    };
+
+    console.log(requestBody);
+
+    fetch(targetURI, {
+      method: 'POST',
+      headers: network.authenticatedHeader,
+      body: JSON.stringify(requestBody),
+    }).then(response => {
+      if (response.ok) {
+        response.json().then(newPosts => {
+          console.log(newPosts);
+          setPosts(oldPosts =>
+            page === 0 ? [...newPosts] : [...oldPosts, ...newPosts]
+          );
+          setIsLoading(false);
+          console.log(posts);
+        });
+      } else if (response.status === 401) {
+        network.refreshAccessToken().then(fetchPosts());
+      } else {
+        console.log(response);
+      }
+    });
+  }
+
+  //useEffect(fetchPosts, []);
 
   return (
     <View>
@@ -153,11 +216,22 @@ export default function PostScreen(props) {
         </Text>
         <Button title="Test geolocation" onPress={testGeolocation} />
       </View>
+      <FlatList
+        data={posts}
+        renderItem={renderPost}
+        keyExtractor={post => post.id.toString()}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.25}
+        initialNumToRender={Config.POSTS_PER_PAGE}
+        ListFooterComponent={renderFooter}
+      />
       <View>
         <Icon.Button name="pencil" onPress={() => nav.navigate('CreatePost')}>
           Make a Post
         </Icon.Button>
       </View>
+      <Button title="Get Posts" onPress={fetchPosts} />
+      <Button title="Clear Data" onPress={clearData} />
     </View>
   );
 }
