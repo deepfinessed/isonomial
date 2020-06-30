@@ -39,7 +39,6 @@ class CRUDPost:
 
         retval = dated_query.order_by(getattr(models.Post, order_by).desc()).offset(page * settings.POSTS_PER_PAGE). \
             limit(settings.POSTS_PER_PAGE).all()
-        logger.info(retval)
         return retval
 
 

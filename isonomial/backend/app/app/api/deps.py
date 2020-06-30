@@ -38,7 +38,8 @@ def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Access token has expired"
         )
-    except (jwt.JWTError, ValidationError):
+    except (jwt.JWTError, ValidationError) as e:
+        logger.info("Validation failed with" + str(e) + "with jwt as " + token)
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",

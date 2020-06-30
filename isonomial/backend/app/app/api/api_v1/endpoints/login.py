@@ -100,7 +100,7 @@ def reset_password(
 @router.post("/login/refresh-for-access-token", response_model=schemas.Token)
 def get_access_from_refresh(user: models.User = Depends(deps.get_user_from_refresh_token)):
     new_access_token = security.create_access_token(
-        subject=user.id, expires_delta=settings.ACCESS_TOKEN_EXPIRE_MINUTES
+        subject=user.id, expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     )
     return {
         "access_token": new_access_token,

@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24
     REFRESH_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 365
     POSTS_PER_PAGE: int = 20
+    DEFAULT_GET_POSTS_EXPIRE_MINUTES: int = 60 * 24 * 2
     SERVER_NAME: str
     SERVER_HOST: AnyHttpUrl
     # BACKEND_CORS_ORIGINS is a JSON-formatted list of origins

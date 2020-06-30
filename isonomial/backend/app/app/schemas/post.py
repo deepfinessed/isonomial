@@ -3,6 +3,7 @@ from typing import Optional, List
 
 from pydantic import BaseModel
 
+from app.core.config import settings
 from app.schemas import User, LocationScope
 
 RELEVANT_GOOGLE_LOCATION_SCOPES = {
@@ -57,5 +58,5 @@ class PostRequest(BaseModel):
     active_scope: LocationScope
     page: Optional[int] = 0
     order_by: Optional[str] = 'date'
-    after_date: Optional[datetime] = datetime.utcnow() - timedelta(days=1)
+    after_date: Optional[datetime] = datetime.utcnow() - timedelta(minutes=settings.DEFAULT_GET_POSTS_EXPIRE_MINUTES)
 
