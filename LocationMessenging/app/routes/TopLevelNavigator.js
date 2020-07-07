@@ -10,16 +10,22 @@ import PostScreen from '../screens/Posts';
 import {Drawer, CustomDrawerContent} from './DrawerNavigator';
 import DrawerNavigator from './DrawerNavigator';
 import CreatePostScreen from '../screens/CreatePost';
+import {NetworkContext} from '../utils/NetworkContext';
 
 const TopLevelStack = createStackNavigator();
 
 export default function TopLevelNavigator() {
   const user = useContext(UserContext);
+  const network = useContext(NetworkContext);
 
   useEffect(() => {
     AsyncStorage.getItem('accessToken').then(token => {
       if (token) {
         user.setAccessToken(token);
+        network.setAuthenticatedHeader({
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token,
+        });
         user.setIsLoggedIn(true);
       }
     });

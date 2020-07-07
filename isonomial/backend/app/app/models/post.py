@@ -34,6 +34,8 @@ class Post(Base):
     user_id = Column(Integer, ForeignKey("user.id"))
     user = relationship("User", back_populates="posts")
 
+    votes = relationship("PostVote", back_populates="post")
+
     def __repr__(self):
         return "%s(%r)" % (self.__class__, self.__dict__)
 

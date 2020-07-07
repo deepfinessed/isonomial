@@ -1,0 +1,18 @@
+declare type Post = {
+  text: string,
+  score: number,
+  date: Date,
+  country: ?string,
+  sublocality: ?string,
+  neighborhood: ?string,
+  colloquial_area: ?string,
+  administrative_area_level_3: ?string,
+  administrative_area_level_1: ?string,
+  administrative_area_level_2: ?string,
+  administrative_area_level_5: ?string,
+  locality: ?string,
+  administrative_area_level_4: ?string,
+  user_score: number,
+  id: number,
+  user_id: number,
+};

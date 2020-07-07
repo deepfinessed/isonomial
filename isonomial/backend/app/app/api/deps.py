@@ -34,6 +34,7 @@ def get_current_user(
         )
         token_data = schemas.TokenPayload(**payload)
     except jwt.ExpiredSignatureError:
+        logger.info("Validation expired with token as " + token)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Access token has expired"
@@ -72,6 +73,7 @@ def get_user_from_refresh_token(
     refresh_token: schemas.RefreshTokenPost, db: Session = Depends(get_db)
 ) -> models.User:
     try:
+        logger.info('Refreshing token %s', refresh_token.refresh_token)
         payload = jwt.decode(
             refresh_token.refresh_token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
         )

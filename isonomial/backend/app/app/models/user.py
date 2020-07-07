@@ -19,4 +19,5 @@ class User(Base):
     is_superuser = Column(Boolean(), default=False)
     items = relationship("Item", back_populates="owner")
     posts = relationship("Post", back_populates="user")
+    votes = relationship("PostVote", back_populates="user")
 

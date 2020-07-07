@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import Config from '../config/Config';
 import {storeRefreshToken, getRefreshToken} from '../utils/credentials';
 import {UserContext} from '../utils/UserContext';
+import {NetworkContext} from '../utils/NetworkContext';
 
 function LoginEmailForm() {
   const [email, setEmail] = useState('');
@@ -13,6 +14,7 @@ function LoginEmailForm() {
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const user = useContext(UserContext);
+  const network = useContext(NetworkContext);
 
   function validateEmail() {
     let regexEmail = new RegExp(
@@ -56,6 +58,10 @@ function LoginEmailForm() {
         storeRefreshToken(data.refresh_token).then(() => {});
         user.setAccessToken(data.access_token);
         AsyncStorage.setItem('accessToken', data.access_token);
+        network.setAuthenticatedHeader({
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + data.access_token,
+        });
         user.setIsLoggedIn(true);
       });
     } else {

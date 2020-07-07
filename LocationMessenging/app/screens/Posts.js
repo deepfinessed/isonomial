@@ -1,3 +1,4 @@
+// @flow
 import React, {useCallback, useContext, useEffect, useState} from 'react';
 import {
   Button,
@@ -25,10 +26,11 @@ import {postStyles} from '../styles/postStyle';
 export default function PostScreen(props) {
   const [locationScope, setLocationScope] = React.useState(null);
   const [geolocatedLocation, setGeoLocatedLocation] = React.useState(null);
-  const [posts, setPosts] = React.useState([]);
+  const [posts: Array<Post>, setPosts] = React.useState([]);
   const [page, setPage] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [loadingBottom, setLoadingBottom] = useState(false);
+  const [hasMorePosts, setHasMorePosts] = useState(true);
   const user = useContext(UserContext);
   const network = useContext(NetworkContext);
   const nav = useNavigation();
@@ -101,7 +103,7 @@ export default function PostScreen(props) {
       if (!user.activeScope && user.locationScopes.length !== 0) {
         user.setActiveScope(user.locationScopes[0]);
       }
-    }, [user.locationScopes]),
+    }, [user]),
   );
 
   function handleLoadMore() {
@@ -143,13 +145,28 @@ export default function PostScreen(props) {
     user.setIsLoggedIn(false);
   }
 
-  function renderPost(post) {
+  function renderPost(iterator: FlatListIterator) {
+    const post: Post = iterator.item[0];
     return (
       <View style={postStyles.parentContainer}>
         <View style={postStyles.voteContainer}>
-          <Icon.Button name="chevron-up" onPress={() => {}} />
-          <Text>{post.text}</Text>
-          <Icon.Button name="chevron-down" onPress={() => {}} />
+          <Icon.Button
+            name="chevron-up"
+            onPress={() => sendVote(1, post.id)}
+            backgroundColor="transparent"
+            color="#007AFF"
+            underlayColor="lightskyblue"
+            iconStyle={{marginRight: 0}}
+          />
+          <Text>{post.score}</Text>
+          <Icon.Button
+            name="chevron-down"
+            onPress={() => sendVote(-1, post.id)}
+            backgroundColor="transparent"
+            color="#007AFF"
+            underlayColor="lightskyblue"
+            iconStyle={{marginRight: 0}}
+          />
           <Moment
             element={Text}
             style={postStyles.footerText}
@@ -167,7 +184,27 @@ export default function PostScreen(props) {
     );
   }
 
+  function sendVote(value: number, postID: number) {
+    const targetURI = Config.BASE_API_URI + 'posts/vote';
+    const requestBody = {
+      value: value,
+      post_id: postID,
+    };
+    fetch(targetURI, {
+      method: 'POST',
+      headers: network.authenticatedHeader,
+      body: JSON.stringify(requestBody),
+    }).then(response => {
+      if (!response.ok) {
+        console.log(response.statusText);
+      }
+    });
+  }
+
   function renderFooter() {
+    if (!hasMorePosts) {
+      return <Text>There are no more posts in this category</Text>;
+    }
     if (!loadingBottom) {
       return null;
     }
@@ -182,6 +219,7 @@ export default function PostScreen(props) {
       page: page,
     };
 
+    console.log(network.authenticatedHeader);
     console.log(requestBody);
 
     fetch(targetURI, {
@@ -193,13 +231,16 @@ export default function PostScreen(props) {
         response.json().then(newPosts => {
           console.log(newPosts);
           setPosts(oldPosts =>
-            page === 0 ? [...newPosts] : [...oldPosts, ...newPosts]
+            page === 0 ? [...newPosts] : [...oldPosts, ...newPosts],
           );
+          if (newPosts.length < Config.POSTS_PER_PAGE) {
+            setHasMorePosts(false);
+          }
           setIsLoading(false);
           console.log(posts);
         });
       } else if (response.status === 401) {
-        network.refreshAccessToken().then(fetchPosts());
+        network.refreshAccessToken().then(() => fetchPosts());
       } else {
         console.log(response);
       }
@@ -209,7 +250,7 @@ export default function PostScreen(props) {
   //useEffect(fetchPosts, []);
 
   return (
-    <View>
+    <View style={postStyles.postScreen}>
       <View>
         <Text style={styles.sectionTitle}>
           You have made it to the posts page.
@@ -219,8 +260,8 @@ export default function PostScreen(props) {
       <FlatList
         data={posts}
         renderItem={renderPost}
-        keyExtractor={post => post.id.toString()}
-        onEndReached={handleLoadMore}
+        keyExtractor={item => item[0].id.toString()}
+        onEndReached={hasMorePosts ? handleLoadMore : () => {}}
         onEndReachedThreshold={0.25}
         initialNumToRender={Config.POSTS_PER_PAGE}
         ListFooterComponent={renderFooter}

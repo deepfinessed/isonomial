@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional, Tuple, Union
 
 from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
@@ -23,9 +23,16 @@ class CRUDPost:
 
     def get_posts(
             self, db: Session, scopes: List[LocationScope], active_scope: LocationScope, page: int,
-            order_by: str, after_date: datetime
-    ) -> List[models.Post]:
-        query = db.query(models.Post)
+            order_by: str, after_date: datetime, user_id: Optional[int]
+    ) -> Union[List[models.Post], List[Tuple[models.Post, Optional[models.PostVote]]]]:
+
+        # get subquery for individual votes
+        if user_id:
+            vote_subquery = db.query(models.PostVote.post_id, models.PostVote.value)\
+                .filter(models.PostVote.user_id == user_id).subquery()
+            query = db.query(models.Post, models.PostVote).outerjoin(vote_subquery, models.Post.id == vote_subquery.c.post_id)
+        else:
+            query = db.query(models.Post)
         # filter query by scopes
         try:
             for scope in scopes[scopes.index(active_scope):]:
@@ -39,7 +46,9 @@ class CRUDPost:
 
         retval = dated_query.order_by(getattr(models.Post, order_by).desc()).offset(page * settings.POSTS_PER_PAGE). \
             limit(settings.POSTS_PER_PAGE).all()
+        logger.info(retval)
         return retval
+
 
 
 post = CRUDPost()

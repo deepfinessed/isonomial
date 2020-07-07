@@ -3,18 +3,23 @@ import {StyleSheet} from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 
 const postStyles = StyleSheet.create({
+  postScreen: {
+    backgroundColor: 'lightgray',
+  },
   parentContainer: {
-    marginTop: 15,
-    width: '100%',
+    marginTop: 5,
+    marginLeft: 5,
+    marginRight: 5,
     borderRadius: 5,
     flexDirection: 'row',
-    alignItems: 'center',
+    backgroundColor: 'white',
   },
   voteContainer: {
     flex: 0,
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
+    width: '15%',
   },
 
   textContainer: {
@@ -24,12 +29,16 @@ const postStyles = StyleSheet.create({
 
   locationText: {
     color: 'skyblue',
-    alignSelf: 'flex-end',
+    textAlign: 'center',
   },
 
   footerText: {
     color: 'lightgray',
-    alignSelf: 'flex-end',
+  },
+
+  voteIcons: {
+    backgroundColor: 'transparent',
+    color: '#007AFF',
   },
 });
 

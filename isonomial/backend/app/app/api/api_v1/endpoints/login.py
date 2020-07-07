@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.api import deps
+from app.backend_pre_start import logger
 from app.core import security
 from app.core.config import settings
 from app.core.security import get_password_hash
@@ -102,6 +103,7 @@ def get_access_from_refresh(user: models.User = Depends(deps.get_user_from_refre
     new_access_token = security.create_access_token(
         subject=user.id, expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     )
+    logger.info('Created new access token %s', new_access_token)
     return {
         "access_token": new_access_token,
         "token_type": "bearer"

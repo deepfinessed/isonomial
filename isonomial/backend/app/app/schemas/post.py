@@ -49,6 +49,8 @@ class PostInDB(PostBase):
 
 
 class Post(PostInDB):
+    user_score: int = 0
+
     def __repr__(self):
         return "%s(%r)" % (self.__class__, self.__dict__)
 
