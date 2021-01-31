@@ -20,9 +20,13 @@ This backend was built using the FastAPI stack. More information can be found at
 
 1. Ensure you have python installed. It can be downloaded at https://www.python.org/downloads/.
 
-2. Install and configure Docker. It can be downloaded at https://www.docker.com/get-started.
+2. Install and configure Docker and docker-compose. It can be downloaded at https://www.docker.com/get-started
 
-3. Set environment variables. The backend requires a large number of environment variables to operate correctly, located in a `.env` file. For ease of setup, you can fill in the marked fields in `env_template.txt` and save it in the same directory as `.env`. 
+3. Install Poetry: `curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -`
+
+4. From the `app` directory, run `poetry install`.
+
+5. Set environment variables. The backend requires a large number of environment variables to operate correctly, located in a `.env` file. For ease of setup, you can fill in the marked fields in `env_template.txt` and save it in the same directory as `.env`. 
 
 Importantly, a Google Maps API Key is required to run the backend. You can get one by following the instructions at https://developers.google.com/maps/documentation/javascript/get-api-key.
 
