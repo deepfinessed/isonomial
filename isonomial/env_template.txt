@@ -1,0 +1,45 @@
+DOMAIN=localhost
+
+STACK_NAME=isonomial-com
+
+TRAEFIK_PUBLIC_NETWORK=traefik-public
+TRAEFIK_TAG=isonomial.com
+TRAEFIK_PUBLIC_TAG=traefik-public
+
+DOCKER_IMAGE_BACKEND=backend
+DOCKER_IMAGE_CELERYWORKER=celeryworker
+DOCKER_IMAGE_FRONTEND=frontend
+
+# Backend
+BACKEND_CORS_ORIGINS=["http://localhost", "http://localhost:4200", "http://localhost:3000", "http://localhost:8080", "https://localhost", "https://localhost:4200", "https://localhost:3000", "https://localhost:8080", "http://dev.isonomial.com", "https://stag.isonomial.com", "https://isonomial.com", "http://local.dockertoolbox.tiangolo.com", "http://localhost.tiangolo.com"]
+PROJECT_NAME=isonomial
+SECRET_KEY=[REPLACE ME]
+FIRST_SUPERUSER=[REPLACE ME]
+FIRST_SUPERUSER_PASSWORD=[REPLACE ME]
+SMTP_TLS=True
+SMTP_PORT=587
+SMTP_HOST=
+SMTP_USER=
+SMTP_PASSWORD=
+EMAILS_FROM_EMAIL=info@isonomial.com
+
+USERS_OPEN_REGISTRATION=False
+
+SENTRY_DSN=
+
+# Isonomial only env variables
+GOOGLE_MAPS_API_KEY=[REPLACE ME]
+
+# Flower
+FLOWER_BASIC_AUTH=[REPLACE ME IN THE FORM user:password]
+
+# Postgres
+POSTGRES_SERVER=db
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=[REPLACE ME]
+POSTGRES_DB=app
+
+# PgAdmin
+PGADMIN_LISTEN_PORT=5050
+PGADMIN_DEFAULT_EMAIL=[REPLACE ME]
+PGADMIN_DEFAULT_PASSWORD=[REPLACE ME]
